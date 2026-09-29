@@ -80,8 +80,8 @@ $('applicationForm').addEventListener('submit',async e=>{
  }catch(err){console.error(err);show($('appError'),'Submission could not be completed: '+(err?.message||err));btn.disabled=false;btn.textContent='Apply & Continue'}
 });
 
-function openAdmin(){ $('applicationCard').style.display='none';$('adminPanel').style.display='block';window.scrollTo(0,0);}
-function closeAdmin(){ $('adminPanel').style.display='none';$('applicationCard').style.display='block';}
+function openAdmin(){ $('adminPanel').style.display='block';$('adminPanel').scrollIntoView({behavior:'smooth',block:'start'});}
+function closeAdmin(){ $('adminPanel').style.display='none';$('applicationCard').scrollIntoView({behavior:'smooth',block:'start'});}
 window.addEventListener('keydown',e=>{if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==='a'){e.preventDefault();openAdmin()}});
 $('adminClose').onclick=closeAdmin;
 $('adminSignIn').onclick=async()=>{hide($('loginError'));const email=$('adminEmail').value.trim(),password=$('adminPassword').value;if(!email||!password)return show($('loginError'),'Enter email and password.');const {error}=await db.auth.signInWithPassword({email,password});if(error)return show($('loginError'),error.message);$('adminLogin').style.display='none';$('adminDashboard').style.display='block';loadRows()};
