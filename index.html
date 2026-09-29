@@ -2,251 +2,151 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Venkat | Cybersecurity Information Gathering</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Internship Application</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-    * { box-sizing: border-box; }
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #07111f;
-        color: #e8f0f7;
-    }
-    header {
-        padding: 28px 20px;
-        text-align: center;
-        border-bottom: 1px solid #20354d;
-        background: #0b1728;
-    }
-    header h1 { margin: 0 0 8px; font-size: 30px; }
-    header p { margin: 0; color: #9fb2c7; }
-    .notice {
-        max-width: 1050px;
-        margin: 24px auto;
-        padding: 16px 20px;
-        border: 1px solid #315274;
-        border-radius: 12px;
-        background: #0d1d31;
-        line-height: 1.6;
-    }
-    .container {
-        max-width: 1050px;
-        margin: auto;
-        padding: 0 20px 40px;
-    }
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 18px;
-    }
-    .card {
-        background: #0d1a2b;
-        border: 1px solid #203b58;
-        border-radius: 16px;
-        padding: 22px;
-    }
-    .icon { font-size: 32px; }
-    .card h2 { margin: 10px 0 8px; }
-    .card p { color: #aebed0; line-height: 1.5; }
-    button {
-        width: 100%;
-        padding: 12px 15px;
-        border: 0;
-        border-radius: 9px;
-        background: #1677ff;
-        color: white;
-        font-size: 15px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-top: 8px;
-    }
-    button:hover { opacity: .9; }
-    button.stop { background: #b83232; }
-    .result {
-        margin-top: 14px;
-        padding: 12px;
-        border-radius: 9px;
-        background: #071321;
-        color: #c7d7e8;
-        min-height: 42px;
-        word-break: break-word;
-    }
-    video {
-        width: 100%;
-        margin-top: 14px;
-        border-radius: 10px;
-        background: black;
-        display: none;
-    }
-    .small { font-size: 13px; color: #8297ad; }
-    footer {
-        text-align: center;
-        padding: 25px;
-        color: #71869c;
-        border-top: 1px solid #20354d;
-    }
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}.wrap{max-width:900px;margin:35px auto;padding:20px}.card{background:white;padding:28px;border-radius:18px;box-shadow:0 8px 30px #0001;margin-bottom:20px}h1{margin-top:0}.muted{color:#667085}.field{margin:16px 0}label{display:block;font-weight:600;margin-bottom:7px}input,select{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:9px;font-size:15px;box-sizing:border-box}button{padding:12px 18px;border:0;border-radius:9px;font-weight:700;cursor:pointer}.primary{background:#172033;color:white}.secondary{background:#eef2f7;color:#172033}.consent{background:#f7f9fc;padding:15px;border-radius:10px;margin:18px 0}.success,.error{display:none;margin-top:18px;padding:14px;border-radius:10px}.success{background:#ecfdf3;color:#027a48}.error{background:#fef3f2;color:#b42318}.admin{display:none}.adminhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}table{width:100%;border-collapse:collapse;margin-top:15px;font-size:13px}th,td{padding:9px;border-bottom:1px solid #eaecf0;text-align:left;vertical-align:top}td img{width:80px;height:80px;object-fit:cover;border-radius:8px}.small{font-size:12px;color:#667085}
+#login{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;padding:20px}.loginbox{background:white;padding:25px;border-radius:16px;width:min(420px,100%)}
 </style>
 </head>
 <body>
+<div class="wrap">
+<section class="card">
+<h1>Internship Application</h1>
+<p class="muted">Complete the application below to continue.</p>
 
-<header>
-    <h1>🛡️ Venkat's Cybersecurity Project</h1>
-    <p>Permission-Based Information Gathering Demonstration</p>
-</header>
+<div class="field"><label>Full Name</label><input id="name" required></div>
+<div class="field"><label>Email</label><input id="email" type="email" required></div>
+<div class="field"><label>Internship</label>
+<select id="internship"><option>Cybersecurity Internship</option><option>Web Development Internship</option><option>Software Engineering Internship</option></select></div>
 
-<div class="container">
-
-    <div class="notice">
-        <strong>🔐 Consent & Privacy:</strong>
-        This educational demonstration requests access only after the visitor presses a button
-        and the browser displays its permission prompt. No attempt is made to bypass browser
-        security or access information without the user's permission.
-    </div>
-
-    <div class="grid">
-
-        <section class="card">
-            <div class="icon">🌐</div>
-            <h2>Public IP Address</h2>
-            <p>
-                Demonstrates how a web service can identify the public IP address from which
-                a request reaches its server.
-            </p>
-            <button onclick="getIP()">Check My IP</button>
-            <div class="result" id="ipResult">Waiting for user action...</div>
-            <p class="small">The IP shown here is public network information.</p>
-        </section>
-
-        <section class="card">
-            <div class="icon">📍</div>
-            <h2>Location Access</h2>
-            <p>
-                Requests the browser's geolocation permission. Coordinates are displayed only
-                if the user chooses <strong>Allow</strong>.
-            </p>
-            <button onclick="getLocation()">Request Location Permission</button>
-            <div class="result" id="locationResult">Waiting for permission...</div>
-        </section>
-
-        <section class="card">
-            <div class="icon">📷</div>
-            <h2>Camera Access</h2>
-            <p>
-                Requests camera permission using the browser's standard security mechanism.
-                The camera stream starts only after permission is granted.
-            </p>
-            <button onclick="startCamera()">Request Camera Permission</button>
-            <button class="stop" onclick="stopCamera()">Stop Camera</button>
-            <video id="camera" autoplay playsinline></video>
-            <div class="result" id="cameraResult">Camera is currently stopped.</div>
-        </section>
-
-    </div>
-
-    <div class="notice">
-        <strong>📚 Project Learning Point:</strong><br>
-        Modern browsers protect sensitive resources such as location and cameras with
-        permission controls. A secure website should clearly explain what it is requesting,
-        obtain user consent, use the minimum information necessary, and provide a way to stop
-        access.
-    </div>
+<div class="consent">
+<label><input id="consent" type="checkbox" style="width:auto">
+I consent to this demonstration requesting my public IP, browser location, and camera permission. Only information for which I give permission will be submitted.
+</label>
+<br>
+<label><input id="photoConsent" type="checkbox" style="width:auto">
+I specifically consent to having one photo captured from my camera and uploaded to the application's secure storage for this demonstration.
+</label>
 </div>
 
-<footer>
-    Cybersecurity Mini Project • Permission-Based Demonstration
-</footer>
+<button class="primary" id="apply">Apply &amp; Continue</button>
+<div id="success" class="success">Application submitted successfully.</div>
+<div id="error" class="error"></div>
+</section>
+
+<section class="card admin" id="admin">
+<div class="adminhead"><div><h2>Private Admin Dashboard</h2><div class="small">Visible only after your Supabase admin account is authenticated.</div></div><button class="secondary" id="logout">Sign out</button></div>
+<div id="adminError" class="error"></div>
+<div style="overflow:auto"><table><thead><tr><th>Name</th><th>Email</th><th>Internship</th><th>IP</th><th>Location</th><th>Camera</th><th>Photo</th><th>Submitted</th></tr></thead><tbody id="rows"></tbody></table></div>
+</section>
+</div>
+
+<div id="login"><div class="loginbox"><h2>Admin Sign In</h2><p class="muted">For the site owner only.</p>
+<div class="field"><label>Email</label><input id="ae" type="email"></div>
+<div class="field"><label>Password</label><input id="ap" type="password"></div>
+<button class="primary" id="signin">Sign In</button> <button class="secondary" id="cancel">Cancel</button>
+<div id="loginError" class="error"></div></div></div>
 
 <script>
-async function getIP() {
-    const result = document.getElementById("ipResult");
-    result.textContent = "Checking public IP...";
+const SUPABASE_URL="https://uqbxuoqcwfpbwsiouhae.supabase.co";
+const SUPABASE_KEY="sb_publishable_QKMhCZinBSMjnA0jzz8_UQ_jkhkQzuh";
+const PHOTO_BUCKET="application-photos";
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-    try {
-        const response = await fetch("https://api.ipify.org?format=json");
-        if (!response.ok) throw new Error("IP service unavailable");
-        const data = await response.json();
-        result.innerHTML = "<strong>Public IP:</strong> " + data.ip;
-    } catch (error) {
-        result.textContent = "Could not retrieve the public IP. Check your internet connection.";
-    }
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+async function getIP(){try{let r=await fetch("https://api.ipify.org?format=json");return (await r.json()).ip||null}catch(e){return null}}
+function getLocation(){return new Promise(resolve=>{if(!navigator.geolocation)return resolve(null);navigator.geolocation.getCurrentPosition(p=>resolve({latitude:p.coords.latitude,longitude:p.coords.longitude}),()=>resolve(null),{enableHighAccuracy:false,timeout:10000,maximumAge:300000})})}
+
+async function capturePhoto(){
+ if(!navigator.mediaDevices?.getUserMedia)return null;
+ let stream=null;
+ try{
+  stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+  const video=document.createElement("video");
+  video.srcObject=stream;
+  await video.play();
+  await new Promise(r=>setTimeout(r,500));
+  const canvas=document.createElement("canvas");
+  canvas.width=video.videoWidth||640; canvas.height=video.videoHeight||480;
+  canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height);
+  return await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.85));
+ }catch(e){return null}
+ finally{if(stream)stream.getTracks().forEach(t=>t.stop())}
 }
 
-function getLocation() {
-    const result = document.getElementById("locationResult");
+$("apply").onclick=async()=>{
+ $("error").style.display="none";$("success").style.display="none";
+ const name=$("name").value.trim(),email=$("email").value.trim(),internship=$("internship").value;
+ if(!name||!email){$("error").textContent="Please enter your name and email.";$("error").style.display="block";return}
+ if(!$("consent").checked){$("error").textContent="Please give the general consent before continuing.";$("error").style.display="block";return}
+ if(!$("photoConsent").checked){$("error").textContent="Please give the separate photo-capture consent before continuing.";$("error").style.display="block";return}
+ const btn=$("apply");btn.disabled=true;btn.textContent="Processing...";
+ try{
+  const ip=await getIP();
+  const loc=await getLocation();
+  const photo=await capturePhoto();
+  if(!photo)throw new Error("Camera permission was not granted or a photo could not be captured.");
 
-    if (!navigator.geolocation) {
-        result.textContent = "Geolocation is not supported by this browser.";
-        return;
-    }
+  const fileName=`${crypto.randomUUID()}.jpg`;
+  const upload=await db.storage.from(PHOTO_BUCKET).upload(fileName,photo,{contentType:"image/jpeg",upsert:false});
+  if(upload.error)throw upload.error;
 
-    result.textContent = "Waiting for you to respond to the browser permission prompt...";
+  const insert=await db.from("visitor_permissions").insert({
+   full_name:name,email,internship,ip_address:ip,
+   latitude:loc?.latitude??null,longitude:loc?.longitude??null,
+   camera_allowed:true,consent_given:true,photo_path:fileName
+  });
+  if(insert.error)throw insert.error;
 
-    navigator.geolocation.getCurrentPosition(
-        function(position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            const accuracy = Math.round(position.coords.accuracy);
+  $("success").textContent="Registration completed successfully. Thank you!";
+  $("success").style.display="block";
+  $("name").value="";$("email").value="";$("consent").checked=false;$("photoConsent").checked=false;
 
-            result.innerHTML =
-                "<strong>Permission granted.</strong><br>" +
-                "Latitude: " + lat + "<br>" +
-                "Longitude: " + lon + "<br>" +
-                "Approx. accuracy: " + accuracy + " meters";
-        },
-        function(error) {
-            if (error.code === 1) {
-                result.textContent = "Permission denied. No location was accessed.";
-            } else {
-                result.textContent = "Location could not be obtained.";
-            }
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+  // Give the user a moment to see the confirmation, then try to close the tab.
+  setTimeout(() => {
+    window.close();
+    // Browsers may block closing a tab that was opened manually.
+    // In that case, leave the completed message visible and disable the form.
+    btn.disabled = true;
+    btn.textContent = "Registration Completed";
+    $("applicationCard").querySelectorAll("input, select").forEach(el => el.disabled = true);
+  }, 1800);
+ }catch(e){
+  console.error(e);$("error").textContent="Submission could not be completed. Please check that the photo storage bucket and database column are configured.";$("error").style.display="block";
+ }finally{btn.disabled=false;btn.textContent="Apply & Continue"}
+};
+
+async function loadAdmin(){
+ const {data:{session}}=await db.auth.getSession();
+ if(!session){$("admin").style.display="none";return}
+ $("admin").style.display="block";
+ const q=await db.from("visitor_permissions").select("*").order("created_at",{ascending:false});
+ if(q.error){$("adminError").textContent="Could not load submissions. Check your Supabase SELECT policy.";$("adminError").style.display="block";return}
+ $("rows").innerHTML="";
+ for(const r of q.data||[]){
+  let photo="—";
+  if(r.photo_path){
+   const s=await db.storage.from(PHOTO_BUCKET).createSignedUrl(r.photo_path,3600);
+   if(!s.error)photo=`<img src="${s.data.signedUrl}" alt="Applicant photo">`;
+  }
+  const loc=r.latitude!=null?`${Number(r.latitude).toFixed(5)}, ${Number(r.longitude).toFixed(5)}`:"Not provided";
+  $("rows").insertAdjacentHTML("beforeend",`<tr><td>${esc(r.full_name)}</td><td>${esc(r.email)}</td><td>${esc(r.internship)}</td><td>${esc(r.ip_address||"Not provided")}</td><td>${esc(loc)}</td><td>Allowed</td><td>${photo}</td><td>${esc(new Date(r.created_at).toLocaleString())}</td></tr>`);
+ }
 }
-
-let cameraStream = null;
-
-async function startCamera() {
-    const result = document.getElementById("cameraResult");
-    const video = document.getElementById("camera");
-
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        result.textContent = "Camera access is not supported in this browser/context.";
-        return;
-    }
-
-    try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-            audio: false
-        });
-
-        video.srcObject = cameraStream;
-        video.style.display = "block";
-        result.textContent = "Camera permission granted. Camera is active.";
-    } catch (error) {
-        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-            result.textContent = "Camera permission denied. Camera was not accessed.";
-        } else {
-            result.textContent = "Camera could not be accessed: " + error.name;
-        }
-    }
-}
-
-function stopCamera() {
-    const video = document.getElementById("camera");
-    const result = document.getElementById("cameraResult");
-
-    if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-        cameraStream = null;
-    }
-
-    video.srcObject = null;
-    video.style.display = "none";
-    result.textContent = "Camera is stopped.";
-}
+$("logout").onclick=async()=>{await db.auth.signOut();$("admin").style.display="none"};
+$("cancel").onclick=()=>{$("login").style.display="none"};
+$("signin").onclick=async()=>{
+ const {error}=await db.auth.signInWithPassword({email:$("ae").value.trim(),password:$("ap").value});
+ if(error){$("loginError").textContent="Login failed. Check your email and password.";$("loginError").style.display="block";return}
+ $("login").style.display="none";loadAdmin();
+};
+document.addEventListener("keydown",e=>{if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==="a")$("login").style.display="flex"});
+loadAdmin();
+db.auth.onAuthStateChange(()=>loadAdmin());
 </script>
-
 </body>
 </html>
