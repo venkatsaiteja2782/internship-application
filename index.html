@@ -3,150 +3,223 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Internship Application</title>
+<title>Private Admin Dashboard</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}.wrap{max-width:900px;margin:35px auto;padding:20px}.card{background:white;padding:28px;border-radius:18px;box-shadow:0 8px 30px #0001;margin-bottom:20px}h1{margin-top:0}.muted{color:#667085}.field{margin:16px 0}label{display:block;font-weight:600;margin-bottom:7px}input,select{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:9px;font-size:15px;box-sizing:border-box}button{padding:12px 18px;border:0;border-radius:9px;font-weight:700;cursor:pointer}.primary{background:#172033;color:white}.secondary{background:#eef2f7;color:#172033}.consent{background:#f7f9fc;padding:15px;border-radius:10px;margin:18px 0}.success,.error{display:none;margin-top:18px;padding:14px;border-radius:10px}.success{background:#ecfdf3;color:#027a48}.error{background:#fef3f2;color:#b42318}.admin{display:none}.adminhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}table{width:100%;border-collapse:collapse;margin-top:15px;font-size:13px}th,td{padding:9px;border-bottom:1px solid #eaecf0;text-align:left;vertical-align:top}td img{width:80px;height:80px;object-fit:cover;border-radius:8px}.small{font-size:12px;color:#667085}
-#login{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;padding:20px}.loginbox{background:white;padding:25px;border-radius:16px;width:min(420px,100%)}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
+.wrap{max-width:1200px;margin:35px auto;padding:20px}
+.card{background:white;padding:28px;border-radius:18px;box-shadow:0 8px 30px #0001}
+h1{margin-top:0}.muted,.small{color:#667085}
+.field{margin:16px 0}label{display:block;font-weight:600;margin-bottom:7px}
+input{width:100%;padding:12px;border:1px solid #d0d5dd;border-radius:9px;font-size:15px;box-sizing:border-box}
+button{padding:10px 14px;border:0;border-radius:8px;font-weight:700;cursor:pointer}
+.primary{background:#172033;color:white}.secondary{background:#eef2f7;color:#172033}
+.danger{background:#fee4e2;color:#b42318}
+.success{display:none;margin-top:15px;padding:12px;border-radius:9px;background:#ecfdf3;color:#027a48}
+.error{display:none;margin-top:15px;padding:12px;border-radius:9px;background:#fef3f2;color:#b42318}
+#dashboard{display:none}#login{max-width:430px;margin:80px auto}
+.adminhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;margin-top:18px;font-size:13px}
+th,td{padding:10px;border-bottom:1px solid #eaecf0;text-align:left;vertical-align:middle}
+td img{width:90px;height:90px;object-fit:cover;border-radius:8px;display:block;margin-bottom:7px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.save{background:#e8f3ff;color:#075985;text-decoration:none;padding:10px 12px;border-radius:8px;font-weight:700;display:inline-block}
 </style>
 </head>
 <body>
 <div class="wrap">
-<section class="card">
-<h1>Internship Application</h1>
-<p class="muted">Complete the application below to continue.</p>
 
-<div class="field"><label>Full Name</label><input id="name" required></div>
-<div class="field"><label>Email</label><input id="email" type="email" required></div>
-<div class="field"><label>Internship</label>
-<select id="internship"><option>Cybersecurity Internship</option><option>Web Development Internship</option><option>Software Engineering Internship</option></select></div>
-
-<div class="consent">
-<label><input id="consent" type="checkbox" style="width:auto">
-I consent to this demonstration requesting my public IP, browser location, and camera permission. Only information for which I give permission will be submitted.
-</label>
-<br>
-<label><input id="photoConsent" type="checkbox" style="width:auto">
-I specifically consent to having one photo captured from my camera and uploaded to the application's secure storage for this demonstration.
-</label>
-</div>
-
-<button class="primary" id="apply">Apply &amp; Continue</button>
-<div id="success" class="success">Application submitted successfully.</div>
-<div id="error" class="error"></div>
+<section class="card" id="login">
+<h1>Admin Sign In</h1>
+<p class="muted">Private dashboard — authorized admin account only.</p>
+<div class="field"><label>Email</label><input id="email" type="email" autocomplete="username"></div>
+<div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+<button class="primary" id="signin">Sign In</button>
+<div id="loginError" class="error"></div>
 </section>
 
-<section class="card admin" id="admin">
-<div class="adminhead"><div><h2>Private Admin Dashboard</h2><div class="small">Visible only after your Supabase admin account is authenticated.</div></div><button class="secondary" id="logout">Sign out</button></div>
+<section class="card" id="dashboard">
+<div class="adminhead">
+<div>
+<h1>Private Admin Dashboard</h1>
+<p class="small">Only authenticated admin users can view this data.</p>
+</div>
+<button class="secondary" id="logout">Sign Out</button>
+</div>
+
 <div id="adminError" class="error"></div>
-<div style="overflow:auto"><table><thead><tr><th>Name</th><th>Email</th><th>Internship</th><th>IP</th><th>Location</th><th>Camera</th><th>Photo</th><th>Submitted</th></tr></thead><tbody id="rows"></tbody></table></div>
+<div id="adminSuccess" class="success"></div>
+
+<div class="tablewrap">
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Internship</th>
+<th>IP</th>
+<th>Location</th>
+<th>Photo</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="rows"></tbody>
+</table>
+</div>
 </section>
 </div>
-
-<div id="login"><div class="loginbox"><h2>Admin Sign In</h2><p class="muted">For the site owner only.</p>
-<div class="field"><label>Email</label><input id="ae" type="email"></div>
-<div class="field"><label>Password</label><input id="ap" type="password"></div>
-<button class="primary" id="signin">Sign In</button> <button class="secondary" id="cancel">Cancel</button>
-<div id="loginError" class="error"></div></div></div>
 
 <script>
 const SUPABASE_URL="https://uqbxuoqcwfpbwsiouhae.supabase.co";
 const SUPABASE_KEY="sb_publishable_QKMhCZinBSMjnA0jzz8_UQ_jkhkQzuh";
 const PHOTO_BUCKET="application-photos";
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
 const $=id=>document.getElementById(id);
-function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 
-async function getIP(){try{let r=await fetch("https://api.ipify.org?format=json");return (await r.json()).ip||null}catch(e){return null}}
-function getLocation(){return new Promise(resolve=>{if(!navigator.geolocation)return resolve(null);navigator.geolocation.getCurrentPosition(p=>resolve({latitude:p.coords.latitude,longitude:p.coords.longitude}),()=>resolve(null),{enableHighAccuracy:false,timeout:10000,maximumAge:300000})})}
-
-async function capturePhoto(){
- if(!navigator.mediaDevices?.getUserMedia)return null;
- let stream=null;
- try{
-  stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
-  const video=document.createElement("video");
-  video.srcObject=stream;
-  await video.play();
-  await new Promise(r=>setTimeout(r,500));
-  const canvas=document.createElement("canvas");
-  canvas.width=video.videoWidth||640; canvas.height=video.videoHeight||480;
-  canvas.getContext("2d").drawImage(video,0,0,canvas.width,canvas.height);
-  return await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",0.85));
- }catch(e){return null}
- finally{if(stream)stream.getTracks().forEach(t=>t.stop())}
+function esc(v){
+ return String(v??"").replace(/[&<>"']/g,c=>({
+   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+ }[c]));
 }
 
-$("apply").onclick=async()=>{
- $("error").style.display="none";$("success").style.display="none";
- const name=$("name").value.trim(),email=$("email").value.trim(),internship=$("internship").value;
- if(!name||!email){$("error").textContent="Please enter your name and email.";$("error").style.display="block";return}
- if(!$("consent").checked){$("error").textContent="Please give the general consent before continuing.";$("error").style.display="block";return}
- if(!$("photoConsent").checked){$("error").textContent="Please give the separate photo-capture consent before continuing.";$("error").style.display="block";return}
- const btn=$("apply");btn.disabled=true;btn.textContent="Processing...";
- try{
-  const ip=await getIP();
-  const loc=await getLocation();
-  const photo=await capturePhoto();
-  if(!photo)throw new Error("Camera permission was not granted or a photo could not be captured.");
+function showError(text){
+ $("adminError").textContent=text;
+ $("adminError").style.display="block";
+ $("adminSuccess").style.display="none";
+}
 
-  const fileName=`${crypto.randomUUID()}.jpg`;
-  const upload=await db.storage.from(PHOTO_BUCKET).upload(fileName,photo,{contentType:"image/jpeg",upsert:false});
-  if(upload.error)throw upload.error;
+function showSuccess(text){
+ $("adminSuccess").textContent=text;
+ $("adminSuccess").style.display="block";
+ $("adminError").style.display="none";
+}
 
-  const insert=await db.from("visitor_permissions").insert({
-   full_name:name,email,internship,ip_address:ip,
-   latitude:loc?.latitude??null,longitude:loc?.longitude??null,
-   camera_allowed:true,consent_given:true,photo_path:fileName
-  });
-  if(insert.error)throw insert.error;
+/* Create a fresh signed URL for the private photo. */
+async function getPhotoUrl(path){
+ const result=await db.storage.from(PHOTO_BUCKET).createSignedUrl(path,3600);
+ if(result.error) throw result.error;
+ return result.data.signedUrl;
+}
 
-  $("success").textContent="Registration completed successfully. Thank you!";
-  $("success").style.display="block";
-  $("name").value="";$("email").value="";$("consent").checked=false;$("photoConsent").checked=false;
-
-  // Give the user a moment to see the confirmation, then try to close the tab.
-  setTimeout(() => {
-    window.close();
-    // Browsers may block closing a tab that was opened manually.
-    // In that case, leave the completed message visible and disable the form.
-    btn.disabled = true;
-    btn.textContent = "Registration Completed";
-    $("applicationCard").querySelectorAll("input, select").forEach(el => el.disabled = true);
-  }, 1800);
- }catch(e){
-  console.error(e);$("error").textContent="Submission could not be completed. Please check that the photo storage bucket and database column are configured.";$("error").style.display="block";
- }finally{btn.disabled=false;btn.textContent="Apply & Continue"}
-};
-
-async function loadAdmin(){
+async function loadDashboard(){
  const {data:{session}}=await db.auth.getSession();
- if(!session){$("admin").style.display="none";return}
- $("admin").style.display="block";
- const q=await db.from("visitor_permissions").select("*").order("created_at",{ascending:false});
- if(q.error){$("adminError").textContent="Could not load submissions. Check your Supabase SELECT policy.";$("adminError").style.display="block";return}
+
+ if(!session){
+   $("login").style.display="block";
+   $("dashboard").style.display="none";
+   return;
+ }
+
+ $("login").style.display="none";
+ $("dashboard").style.display="block";
+
+ const q=await db.from("visitor_permissions")
+   .select("id,full_name,email,internship,ip_address,latitude,longitude,photo_path")
+   .order("created_at",{ascending:false});
+
+ if(q.error){
+   showError("Could not load applications. Check the Supabase SELECT policy.");
+   return;
+ }
+
  $("rows").innerHTML="";
+
  for(const r of q.data||[]){
-  let photo="—";
-  if(r.photo_path){
-   const s=await db.storage.from(PHOTO_BUCKET).createSignedUrl(r.photo_path,3600);
-   if(!s.error)photo=`<img src="${s.data.signedUrl}" alt="Applicant photo">`;
-  }
-  const loc=r.latitude!=null?`${Number(r.latitude).toFixed(5)}, ${Number(r.longitude).toFixed(5)}`:"Not provided";
-  $("rows").insertAdjacentHTML("beforeend",`<tr><td>${esc(r.full_name)}</td><td>${esc(r.email)}</td><td>${esc(r.internship)}</td><td>${esc(r.ip_address||"Not provided")}</td><td>${esc(loc)}</td><td>Allowed</td><td>${photo}</td><td>${esc(new Date(r.created_at).toLocaleString())}</td></tr>`);
+   let photoCell="No photo";
+   let actionCell="";
+
+   if(r.photo_path){
+     try{
+       const url=await getPhotoUrl(r.photo_path);
+
+       photoCell=
+         `<img src="${url}" alt="Applicant photo">
+          <a class="save" href="${url}" target="_blank" rel="noopener">Open / Save</a>`;
+
+       actionCell=
+         `<a class="save" href="${url}" target="_blank" rel="noopener">Save Photo</a>
+          <button class="danger" onclick="deleteApplication('${esc(r.id)}','${esc(r.photo_path)}')">Delete</button>`;
+     }catch(e){
+       photoCell="Photo unavailable";
+       actionCell=`<button class="danger" onclick="deleteApplication('${esc(r.id)}','${esc(r.photo_path||"")}')">Delete</button>`;
+     }
+   }else{
+     actionCell=`<button class="danger" onclick="deleteApplication('${esc(r.id)}','')">Delete</button>`;
+   }
+
+   const loc=r.latitude!=null
+     ? `${Number(r.latitude).toFixed(5)}, ${Number(r.longitude).toFixed(5)}`
+     : "Not provided";
+
+   $("rows").insertAdjacentHTML("beforeend",
+    `<tr>
+      <td>${esc(r.full_name)}</td>
+      <td>${esc(r.email)}</td>
+      <td>${esc(r.internship)}</td>
+      <td>${esc(r.ip_address||"Not provided")}</td>
+      <td>${esc(loc)}</td>
+      <td>${photoCell}</td>
+      <td><div class="actions">${actionCell}</div></td>
+    </tr>`
+   );
  }
 }
-$("logout").onclick=async()=>{await db.auth.signOut();$("admin").style.display="none"};
-$("cancel").onclick=()=>{$("login").style.display="none"};
+
+async function deleteApplication(id,photoPath){
+ if(!confirm("Delete this application and its saved photo permanently?")) return;
+
+ try{
+   if(photoPath){
+     const storageDelete=await db.storage.from(PHOTO_BUCKET).remove([photoPath]);
+     if(storageDelete.error) throw storageDelete.error;
+   }
+
+   const deleted=await db.from("visitor_permissions").delete().eq("id",id);
+   if(deleted.error) throw deleted.error;
+
+   showSuccess("Application and photo deleted.");
+   await loadDashboard();
+ }catch(e){
+   console.error(e);
+   showError("Delete failed. Check the Supabase DELETE policies.");
+ }
+}
+
 $("signin").onclick=async()=>{
- const {error}=await db.auth.signInWithPassword({email:$("ae").value.trim(),password:$("ap").value});
- if(error){$("loginError").textContent="Login failed. Check your email and password.";$("loginError").style.display="block";return}
- $("login").style.display="none";loadAdmin();
+ $("loginError").style.display="none";
+
+ const email=$("email").value.trim();
+ const password=$("password").value;
+
+ if(!email||!password){
+   $("loginError").textContent="Enter your admin email and password.";
+   $("loginError").style.display="block";
+   return;
+ }
+
+ $("signin").disabled=true;
+
+ const {error}=await db.auth.signInWithPassword({email,password});
+
+ $("signin").disabled=false;
+
+ if(error){
+   $("loginError").textContent="Login failed. Check your email and password.";
+   $("loginError").style.display="block";
+   return;
+ }
+
+ loadDashboard();
 };
-document.addEventListener("keydown",e=>{if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==="a")$("login").style.display="flex"});
-loadAdmin();
-db.auth.onAuthStateChange(()=>loadAdmin());
+
+$("logout").onclick=async()=>{
+ await db.auth.signOut();
+ loadDashboard();
+};
+
+db.auth.onAuthStateChange(()=>loadDashboard());
+loadDashboard();
 </script>
 </body>
 </html>
